@@ -1,8 +1,10 @@
 package com.example.apiexploration;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,15 +12,16 @@ import android.graphics.Rect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.media.audiofx.Equalizer;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,9 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class AudioFxDemo extends Activity {
     private static final String TAG = "AudioFxDemo";
     private static final float VISUALIZER_HEIGHT_DIP = 100f;
-    private MediaPlayer mMediaPlayer;
-    private Visualizer mVisualizer;
-    private Equalizer mEqualizer;
+    private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
     private LinearLayout mLinearLayout;
     private VisualizerView mVisualizerView;
     private TextView mStatusTextView;
@@ -45,7 +46,7 @@ public class AudioFxDemo extends Activity {
         mLinearLayout.addView(mStatusTextView);
         setContentView(mLinearLayout);
         // Create the MediaPlayer
-        startRecording();
+        checkRecordAudioPermission();
         setupVisualizerFxAndUI();
         mStatusTextView.setText("Say something..");
     }
@@ -84,6 +85,30 @@ public class AudioFxDemo extends Activity {
                 audioRecord.release();
             }
         }).start();
+    }
+
+    private void checkRecordAudioPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // Permission has not been granted yet, request it from the user
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_RECORD_AUDIO);
+        } else {
+            // Permission has already been granted, proceed with audio capture
+            startRecording();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_RECORD_AUDIO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted, proceed with audio capture
+                startRecording();
+            } else {
+                // Permission has been denied, show a message to the user or handle the error
+                Toast.makeText(this, "Audio capture permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void stopRecording() {
