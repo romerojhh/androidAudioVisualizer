@@ -47,7 +47,7 @@ public class AudioFxDemo extends Activity {
         // Create the MediaPlayer
         startRecording();
         setupVisualizerFxAndUI();
-        mStatusTextView.setText("Playing audio...");
+        mStatusTextView.setText("Say something..");
     }
 
     private AudioRecord audioRecord;
