@@ -60,7 +60,7 @@ public class AudioFxDemo extends Activity {
         int sampleRate = 44100;
         int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_8BIT;
-        bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) - 1000;
+        bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) ;
 
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
 
